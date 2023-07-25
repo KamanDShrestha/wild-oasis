@@ -5,7 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getCabins } from '../../services/apiCabins';
 import Spinner from '../../ui/Spinner';
 import { Cabins } from '../../../types/collection.ts';
-
+import CabinRow from './CabinRow.tsx';
+// import { CabinRow } from './CabinRow.tsx';
 const CabinTable = () => {
   //getting the data from the database
   const {
@@ -31,6 +32,9 @@ const CabinTable = () => {
         <div>Discount</div>
         <div></div>
       </TableHeader>
+      {cabins?.map((cabin) => (
+        <CabinRow cabin={cabin} key={cabin.id} />
+      ))}
     </Table>
   );
 };
