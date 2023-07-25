@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import { isFuture, isPast, isToday } from 'date-fns';
 // import supabase from "../services/supabase";
@@ -7,7 +8,7 @@ import { isFuture, isPast, isToday } from 'date-fns';
 import { bookings } from './data-bookings';
 import { cabins } from './data-cabins';
 import { guests } from './data-guests';
-
+import supabase from '../services/supabase';
 // const originalSettings = {
 //   minBookingLength: 3,
 //   maxBookingLength: 30,
