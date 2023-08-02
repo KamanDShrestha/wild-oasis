@@ -1,86 +1,149 @@
-import styled from "styled-components";
+import React from 'react';
+import { Input } from '../../ui/Input';
+import Form from '../../ui/Form';
+import Button from '../../ui/Button';
+import FileInput from '../../ui/FileInput';
+import Textarea from '../../ui/Textarea';
+import { FieldValues, useForm } from 'react-hook-form';
+import { Cabins } from '../../../types/collection';
+import FormRow from '../../ui/FormRow';
+import useCabinEdit from './useCabinEdit';
+import { useCabinCreate } from './useCabinCreate';
 
-import Input from "../../ui/Input";
-import Form from "../../ui/Form";
-import Button from "../../ui/Button";
-import FileInput from "../../ui/FileInput";
-import Textarea from "../../ui/Textarea";
+interface Props {
+  cabinToEdit?: Cabins;
+  setIsEditing: (isEditing: boolean) => void;
+}
 
-const FormRow = styled.div`
-  display: grid;
-  align-items: center;
-  grid-template-columns: 24rem 1fr 1.2fr;
-  gap: 2.4rem;
+function CreateCabinForm({ cabinToEdit, setIsEditing }: Props) {
+  //if this form is for editing the cabin
+  const edit_id = cabinToEdit?.id;
 
-  padding: 1.2rem 0;
+  //getting the query client to change the UI when the data is being inserted.
+  const { register, handleSubmit, formState, reset, getValues } = useForm({
+    defaultValues: edit_id ? cabinToEdit : {},
+  });
 
-  &:first-child {
-    padding-top: 0;
+  const { editCabin, isEditing } = useCabinEdit();
+  const { createCabin, isCreating } = useCabinCreate();
+
+  console.log(formState.errors);
+  function onSubmit(data: FieldValues) {
+    //checking if it's the image string or FileList
+    const image = typeof data.image === 'string' ? data.image : data?.image[0];
+    console.log(data);
+    if (edit_id) {
+      console.log('Ediitting');
+      editCabin(
+        { newCabinData: { ...data, image: image }, id: edit_id },
+        {
+          onSuccess: () => {
+            reset();
+            setIsEditing(false);
+          },
+        }
+      );
+    } else {
+      createCabin(
+        { ...data, image: data?.image[0] },
+        {
+          onSuccess: () => {
+            reset();
+          },
+        }
+      );
+    }
   }
-
-  &:last-child {
-    padding-bottom: 0;
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-
-  &:has(button) {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1.2rem;
-  }
-`;
-
-const Label = styled.label`
-  font-weight: 500;
-`;
-
-const Error = styled.span`
-  font-size: 1.4rem;
-  color: var(--color-red-700);
-`;
-
-function CreateCabinForm() {
   return (
-    <Form>
-      <FormRow>
-        <Label htmlFor="name">Cabin name</Label>
-        <Input type="text" id="name" />
+    <Form onSubmit={handleSubmit((data) => onSubmit(data))}>
+      <FormRow label='Cabin Name' error={formState.errors.name}>
+        <Input
+          type='text'
+          id='name'
+          {...register('name', { required: 'Cabin name cannot be empty!' })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="maxCapacity">Maximum capacity</Label>
-        <Input type="number" id="maxCapacity" />
+      <FormRow label='Maximum capacity' error={formState.errors.maxCapacity}>
+        <Input
+          type='number'
+          id='maxCapacity'
+          {...register('maxCapacity', {
+            required: 'Please enter maximum capacity',
+            min: {
+              value: 1,
+              message: 'Minimum 1 person would be staying at the cabin!',
+            },
+          })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="regularPrice">Regular price</Label>
-        <Input type="number" id="regularPrice" />
+      <FormRow label='Regular Price' error={formState.errors.regularPrice}>
+        <Input
+          type='number'
+          id='regularPrice'
+          {...register('regularPrice', {
+            required: 'Please enter regular price!',
+            min: {
+              value: 500,
+              message: 'Regular price is always greater than 500',
+            },
+          })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="discount">Discount</Label>
-        <Input type="number" id="discount" defaultValue={0} />
+      <FormRow label='Discount' error={formState.errors.discount}>
+        <Input
+          type='number'
+          id='discount'
+          defaultValue={0}
+          {...register('discount', {
+            required: 'Please provide the discount amount',
+            validate: (value) =>
+              Number(value) <= Number(getValues().regularPrice) ||
+              'Discount should be less that regular price',
+          })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="description">Description for website</Label>
-        <Textarea type="number" id="description" defaultValue="" />
+      <FormRow
+        label='Description for website'
+        error={formState.errors.description}
+      >
+        <Textarea
+          type='number'
+          id='description'
+          defaultValue=''
+          {...register('description', {
+            required: 'Please provide a description',
+          })}
+        />
       </FormRow>
 
-      <FormRow>
-        <Label htmlFor="image">Cabin photo</Label>
-        <FileInput id="image" accept="image/*" />
+      <FormRow label='Cabin Photo'>
+        <FileInput
+          id='image'
+          accept='image/*'
+          {...register('image', {
+            required: edit_id ? false : 'Please provide a image!',
+          })}
+        />
       </FormRow>
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        <Button variation='secondary' type='reset'>
           Cancel
         </Button>
-        <Button>Edit cabin</Button>
+        <Button variation='primary' disabled={isCreating}>
+          {edit_id
+            ? isEditing
+              ? 'Editing'
+              : 'Edit Cabin'
+            : isCreating
+            ? 'Adding cabin'
+            : 'Add Cabin'}
+        </Button>
       </FormRow>
     </Form>
   );

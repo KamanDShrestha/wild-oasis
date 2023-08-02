@@ -6,17 +6,12 @@ import { getCabins } from '../../services/apiCabins';
 import Spinner from '../../ui/Spinner';
 import { Cabins } from '../../../types/collection.ts';
 import CabinRow from './CabinRow.tsx';
+import { useCabins } from './useCabins.ts';
 // import { CabinRow } from './CabinRow.tsx';
 const CabinTable = () => {
   //getting the data from the database
-  const {
-    data: cabins,
-    isLoading,
-    error,
-  } = useQuery<Cabins[], Error>({
-    queryKey: ['cabins'],
-    queryFn: getCabins,
-  });
+
+  const { cabins, isLoading, error } = useCabins();
 
   console.log(cabins);
 

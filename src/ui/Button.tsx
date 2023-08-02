@@ -48,17 +48,17 @@ const variations: { [key: string]: RuleSet<object> } = {
   `,
 };
 
-const Button = styled.button<{ type: string; size: string }>`
+const Button = styled.button<{ variation: string; size: string }>`
   border: none;
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-md);
-  ${(props) => variations[props.type]}
+  ${(props) => variations[props.variation]}
   ${(props) => sizes[props.size]}
   cursor: pointer;
 `;
 
 Button.defaultProps = {
-  type: 'primary',
+  variation: 'primary',
   size: 'medium',
 };
 
