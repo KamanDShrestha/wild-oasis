@@ -52,22 +52,23 @@ export async function createEditCabin(newCabin?: any, id?: number) {
     throw new Error('Cabins could not be created');
   }
 
-  //upload the image to the bucket
-  const { error: storageError } = await supabase.storage
-    .from('cabins')
-    .upload(imageName, newCabin.image);
+  if (!alreadyImage) {
+    //upload the image to the bucket
+    const { error: storageError } = await supabase.storage
+      .from('cabins')
+      .upload(imageName, newCabin.image);
 
-  //if storage error when uploading image
+    //if storage error when uploading image
 
-  if (storageError) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await supabase.from('cabins').delete().eq('id', data.id);
-    console.log(storageError);
-    throw new Error(
-      'Cabin image cannot be uploaded and cabin is not created as well'
-    );
+    if (storageError) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await supabase.from('cabins').delete().eq('id', data.id);
+      console.log(storageError);
+      throw new Error(
+        'Cabin image cannot be uploaded and cabin is not created as well'
+      );
+    }
   }
-
   //editing the cabin
 }
 

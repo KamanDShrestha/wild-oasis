@@ -49,6 +49,7 @@ import { toast } from 'react-hot-toast';
 import CreateCabinForm from './CreateCabinForm';
 import { useCabinCreate } from './useCabinCreate';
 import useCabinDelete from './useCabinDelete';
+import { HiSquare2Stack } from 'react-icons/hi2';
 interface Props {
   cabin: Cabins;
 }
@@ -56,6 +57,15 @@ interface Props {
 const CabinRow = ({ cabin }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const { deleteThisCabin, isDeleting } = useCabinDelete();
+  const { createCabin, isCreating } = useCabinCreate();
+
+  function handleDuplication() {
+    const { id, ...newCabin } = cabin;
+    const newDuplicatedCabin = { ...newCabin, name: `Copy of ${cabin.name}` };
+    console.log(newDuplicatedCabin);
+    createCabin(newDuplicatedCabin);
+  }
+
   return (
     <>
       <TableRow role='row'>
@@ -67,6 +77,14 @@ const CabinRow = ({ cabin }: Props) => {
           {!cabin.discount ? '--' : formatCurrency(cabin.discount as number)}
         </Discount>
         <div>
+          <Button
+            variation='secondary'
+            size='small'
+            onClick={handleDuplication}
+            disabled={isCreating}
+          >
+            <HiSquare2Stack />
+          </Button>
           <Button
             variation='secondary'
             size='small'
